@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width initial-scale=1 user-scalable=no" />
+		<title>performance</title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			body {
+				background: yellowgreen;
+			}
+			
+			.containers {
+				width: 300px;
+				height: 300px;
+				position: relative;
+				left: 50%;
+				margin-left: -150px;
+				margin-top: 120px;
+			}
+			
+			.wheel {
+				width: 300px;
+				height: 300px;
+				position: absolute;
+				transition: all 3s ease-in-out;
+				-moz-transition: all 3s ease-in-out;
+				-webkit-transition: all 3s ease-in-out;
+				-ms-transition: all 3s ease-in-out;
+			}
+			
+			.pt {
+				width: 10px;
+				height: 160px;
+				position: absolute;
+				top: 0px;
+				left: 145px;
+			}
+			
+			#start {
+				width: 200px;
+				height: 40px;
+				line-height: 40px;
+				text-align: center;
+				color: white;
+				font-size: 18px;
+				background: red;
+				border: none;
+				position: absolute;
+				top: 75%;
+				left: 50%;
+				margin-left: -100px;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+		<button id="start">START</button>
+		<div class="containers">
+			<div class="wheel" id="wheel">
+				<canvas id="can" width="300" height="300"></canvas>
+			</div>
+			<div class="pt">
+				<canvas id="cnt" width="10" height="160"></canvas>
+			</div>
+		</div>
+
+		<script src="js/jquery.min.js"></script>
+		<script type="text/javascript">
+			var oCan = document.getElementById("can");
+			var c = oCan.getContext("2d");
+			var oCnt = document.getElementById("cnt");
+			var ct = oCnt.getContext("2d");
+			//画圆
+//			cirle(155, "black");
+			//转盘
+			turnTable(60);
+			//标题	
+			title();
+			//指针
+			pointer();
+			//点击抽奖
+			performance("start","wheel");
+			function turnTable(num) {
+				for (var i = 0; i < 360 / num; i++) {
+					c.save();
+					c.beginPath();
+					c.fillStyle = randomColor();
+					c.moveTo(150, 150);
+					c.arc(150, 150, 150, i * Math.PI / 180 * num, (i + 1) * Math.PI / 180 * num);
+					c.lineTo(150, 150);
+					c.fill();
+					c.closePath();
+					c.restore();
+				}
+				cirle(50, "gold");
+				cirle(25, "brown");
+			}
+			function title() {
+				for (var i = 1; i < 7; i++) {
+					c.save();
+					c.beginPath();
+					c.font = "15px sans-self";
+					c.lineWidth = 0.7;
+					c.strokeStyle = "white"
+					c.translate(150, 150);
+					c.rotate(i * Math.PI / 180 * 60);
+					if (i == 6) {
+						c.font = "12px sans-self";
+						c.strokeText("谢谢参与!", -30, -100);
+					} else {
+						c.strokeText(i + "等奖", -20, -100);
+					}
+					c.closePath();
+					c.restore();
+				}
+			}
+			function pointer() {
+				ct.save();
+				ct.beginPath();
+				ct.lineWidth = 10;
+				ct.fillStyle = "white";
+				ct.moveTo(0, 150);
+				ct.lineTo(5, 80);
+				ct.lineTo(10, 150);
+				ct.fill();
+				ct.closePath();
+				ct.restore();
+				cirle(10, "white");
+			}
+			function performance(start,wheel) {
+				var oBtn = document.getElementById(start);
+				var oWheel = document.getElementById(wheel);
+				var i = 0;
+				oBtn.onclick = function() {
+					var angle = Math.floor(Math.random() * 7) * 60;
+					oBtn.setAttribute("disabled", true);
+					oBtn.style.backgroundColor = "#ccc";
+					i += 8
+					oWheel.style.webkitTransform = "rotate(" + (angle + i * 180) + "deg)";
+					oWheel.style.MozTransform = "rotate(" + (angle + i * 180) + "deg)";
+					setTimeout(function() {
+						if (((360 - angle) / 60) == 6 || ((360 - angle) / 60) == 0) {
+							confirm("谢谢参与!");
+						} else {
+							confirm("恭喜您获得" + ((360 - angle) / 60) + "等奖");
+						}
+						oBtn.removeAttribute("disabled");
+						oBtn.style.backgroundColor = "red";
+					}, 3000);
+				}
+			}
+			//随即色
+			function randomColor() {
+				var oRandom = Math.floor(Math.random() * 1000000);
+				if (oRandom < 99999) {
+					oRandom = Math.floor(Math.random() * 1000000);
+				}
+				return "#" + oRandom;
+			}
+			//圆
+			function cirle(r, clor) {
+				c.save();
+				c.beginPath();
+				c.fillStyle = clor;
+				c.arc(150, 150, r, 0, Math.PI / 180 * 360);
+				c.fill();
+				c.closePath();
+				c.restore();
+			}
+		</script>
+	</body>
+
+</html>
